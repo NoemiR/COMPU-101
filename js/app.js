@@ -1,0 +1,217 @@
+console.log('My game')
+
+let time = 60;
+let timer;
+let wordCount = 0;
+let points = 0;
+let nextRound = 0;
+let correctWord = 0;
+let wrongAnswer = 0;
+let text = $("#strike")
+text.css("color: red", "font-size: 45px");
+
+
+
+const words = [ 
+
+['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+
+['rojo', 'pez', 'frio', 'calor', 'si', 'luz', 'claro', 'listo', 'cielo', 'mar', 'sol', 'sopa', 'verde',
+'carro', 'palo', 'no', 'vamos', 'bailar', 'publico', 'pues', 'silla', 'gris', 'dulce', 'bebe', 'agua',
+'cafe', 'frijoles', 'cama', 'giante', 'pelo'],     
+['lago', 'amarillo', 'uno', 'calzeta', 'casa',
+'negro', 'dos', 'tres', 'manzana', 'que', 'arroz', 'caballo', 'porque', 'diez',
+'chango', 'vaca', 'plato', 'mesa', 'taza', 'candelario', 'banana', 'azul', 'caballo',
+'fuerza', 'nieve', 'gato', 'tigre',  'dia', 'paleta', 'nuve', 'paz',
+'policia', 'sonido', 'todavia', 'mucho', 'amor', 'juguete', 'gracias', 'nadar', 'pajaro'],
+['arcoiris', 'seguridad', 'crepas', 'lluvia', 'tamal', 'queso', 'telefono', 'resumen', 'computadora',
+'opcion', 'banquete', 'precio', 'perdon', 'familia', 'estufa', 'bonita', 'telescopio', 'gasolina', 'ensalada', 'library', 'star', 'sushi', 'ocean'],	
+['trabajo', 'dinosaurio', 'principio', 'increible', 'trece', 'conclusion', 'lapiz',
+'vocabulario', 'triangulo', 'rimas', 'ejemplo', 'dictionario',  'algo',
+'intend', 'practice', 'pictures', 'poemas', 'selections', 'elefante', 'Italy',
+'giraffe', 'coffee', 'installation', 'address', 'evident', 'accord', 'approach', 'establish',
+'straight', 'apparent', 'passage'],     ['available', 'management', 'traintrack', 'continuing',
+'outstanding', 'appointed', 'earnest', 'convention', 'territory', 'undertake', 'hockey', 'soccer',
+'majority', 'attitude', 'manifest', 'resource', 'contempt', 'distinction',
+'inclined', 'attribute', 'disposition', 'bestow', 'corruption', 'crerical'],
+['ascertain', 'perpetual', 'substancial', 'elaborate', 'conspicuous',
+'proceeding', 'extravagant', 'venerate', 'suffrage', 'intrigue', 'dispatch',
+'railroad', 'undertaking', 'predecessor', 'delicacy', 'registration', 'dearborn', 'Ravenswood', 'laundroumat', 'basketball'],     ['Alfa', 'Bravo',
+'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliett',
+'Kilo', 'Lima', 'Mike', 'November', 'Oscar', 'Papa', 'Quebec', 'Romeo',
+'Sierra', 'Tango', 'Uniform', 'Victor', 'Whiskey', 'X-ray', 'Yankee', 'Zulu'],
+];
+
+console.log(words);
+
+const countingWords = () => {
+	// increase wordCount
+	if(wordCount < 10){
+		wordCount++;
+		
+
+	} else { // we've done 10 words -- reset wordCount to 0 and go to next round
+		// console.log("resetting word count")
+		wordCount = 0;
+		clearInterval(timer);
+		toggleModal();		
+	}
+}
+
+const getWord = () => {
+
+	// get the correct array for this round
+	const roundArray = words[nextRound];
+
+	// get random word from that array
+ 	const word = roundArray[Math.floor(Math.random() * roundArray.length)];
+
+  	let box = $('#wordBox')
+  	box.text(word);
+	
+	// tell user they won (html/jq)  	
+}
+const correctGuess = () => {
+
+	if(correctWord === 10){
+		clearInterval(timer);
+		toggleModal();
+		
+	}
+	else if(correctWord === 7){
+		gameOver();
+	} else {
+		console.log(correctWord);
+	}
+
+}
+
+
+function startRound() {
+	console.log(nextRound);
+	// on round 1 there is no modal to close
+	if(nextRound !== 0) {
+		toggleModal();
+	}	
+	// $('audio#pop2')[0].play()
+	nextRound++;
+	setTimer();
+	console.log('nextround', nextRound)
+	$('#rounds').text('Round: ' + nextRound)
+	getWord();
+	time = 60;
+	correctWord = 0;
+
+}
+
+function gameOver() {
+	if(wrongAnswer === 3){
+		clearInterval(timer);
+		$('#wordBox').hide()
+		$('#container').hide()
+		$('audio#pop2')[0].pause()
+		$('audio#pop')[0].play()
+		toggleModal("Game Over", "Restart");
+	
+	}
+
+}
+
+const setTimer = () => {
+	
+  	timer = setInterval(() => {
+  		// console.log(timer+" is this");
+
+		time--
+		$('#time').text('Time: ' + time)
+		// console.log( time + ' timer is running');
+
+		if(time === 0){
+
+			clearInterval(timer);
+			
+			toggleModal();
+			// if they got enough points, move to next round
+		}
+
+	}, 1000);
+}
+
+
+function toggleModal(str, txt) {
+	if(txt === 'Restart'){
+		clearInterval(timer);
+		$('#wordBox').show()
+		$('#container').show()
+		$('#strike').detach()
+		points = 0;
+		nextRound = 0;
+		time = 60;
+		correctWord = 0;
+		// getWord();
+		//points, score, whatever
+		// reset your variables 
+	}
+	//change message
+	$('#message').text(str)
+	//change button text
+	$("#modal-button").text(txt);
+	// how do I toggle a class in jquery
+    $(".modal").toggleClass("show-modal");
+}
+
+
+$("#modal-button").on("click", (event) => {
+	event.preventDefault()
+	// toggleModal();
+	startRound();
+})
+
+
+
+
+$(".close-button").on("click", toggleModal);
+// check answer
+$('#answer').on('click', (event) => {//this gets the input 
+	event.preventDefault();//this prevents it 
+
+	const wordAnswer = $('#answerText').val();
+	console.log(wordAnswer);
+	
+	$('#answerText').text(wordAnswer);
+
+	//if the word given is the same
+	if($('#wordBox').text() === wordAnswer) {
+		points++;
+		correctWord++;
+		console.log(correctWord);
+		// print points in html
+		$('#score').text("Points: " + points)
+		getWord();
+		correctGuess();	
+		// clear out the input
+		$('#answerText').val('')
+
+	} else { // user typed word incorrectly
+		points--;
+		wrongAnswer++;
+		text.append("x")
+		gameOver();
+		
+		
+		$('#score').text("Points: " + points)
+		// print points in html
+		
+		$('#answerText').val('')
+	}
+})
+
+$('#name').on('click', (event) => {
+	event.preventDefault();
+	// $('#name').effect('explode');
+	const changeName = $('input').val();
+	$('#display').text(changeName);	
+	$('#playername').val('')
+	$('audio#pop2')[0].play()
+	startRound();
+})
